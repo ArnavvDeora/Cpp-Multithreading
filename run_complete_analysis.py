@@ -14,6 +14,7 @@ import os
 import sys
 from data_preprocessing import clean_dataset, analyze_dataset
 from analysis_questions import DatasetAnalyzer
+from question1_amex_analysis import AmexPortalAnalyzer
 
 # Configuration
 PARQUET_FILE_PATH = "your_dataset.parquet"  # Update this with your actual file path
@@ -64,11 +65,38 @@ def main():
         
         analyzer.create_visualizations(save_plots=True)
         
-        # Step 4: Summary Report
-        print("\n📋 STEP 4: SUMMARY REPORT")
+        # Step 4: Question 1 Specific Analysis
+        print("\n🎯 STEP 4: QUESTION 1 ANALYSIS")
         print("-" * 50)
         
-        generate_summary_report(results, cleaned_df)
+        try:
+            q1_analyzer = AmexPortalAnalyzer(cleaned_output_path)
+            q1_results = q1_analyzer.solve_question_1()
+            
+            if q1_results:
+                # Save Question 1 results
+                with open('question1_results.txt', 'w') as f:
+                    f.write("QUESTION 1 RESULTS\n")
+                    f.write("==================\n\n")
+                    f.write(f"Statement 1 (Airline Offers): {q1_results['statement1']}\n")
+                    f.write(f"Statement 2 (Discount Savings): {q1_results['statement2']}\n")
+                    f.write(f"Population Count: {q1_results['population']}\n\n")
+                    f.write(f"Active Users Identified: {q1_results['active_users_count']}\n")
+                    f.write(f"Analysis Methods Used: {q1_results['methods_used']}\n")
+                
+                print("✅ Question 1 analysis completed and saved")
+            else:
+                print("⚠️  Question 1 analysis completed with warnings")
+                
+        except Exception as e:
+            print(f"⚠️  Question 1 analysis failed: {str(e)}")
+            q1_results = None
+        
+        # Step 5: Summary Report
+        print("\n📋 STEP 5: SUMMARY REPORT")
+        print("-" * 50)
+        
+        generate_summary_report(results, cleaned_df, q1_results)
         
         print("\n✅ ANALYSIS PIPELINE COMPLETED SUCCESSFULLY!")
         print("\nGenerated Files:")
@@ -76,6 +104,8 @@ def main():
         print(f"  • cleaned_dataset.csv - CSV version of cleaned dataset")
         print(f"  • dataset_analysis_plots.png - Visualization plots")
         print(f"  • analysis_summary_report.txt - Summary report")
+        if q1_results:
+            print(f"  • question1_results.txt - Question 1 specific results")
         
         return True
         
@@ -83,7 +113,7 @@ def main():
         print(f"ERROR: Analysis pipeline failed with error: {str(e)}")
         return False
 
-def generate_summary_report(results, cleaned_df):
+def generate_summary_report(results, cleaned_df, q1_results=None):
     """
     Generate a summary report file
     """
@@ -144,6 +174,13 @@ def generate_summary_report(results, cleaned_df):
             f.write("• Predictive Analysis: Completed\n")
             f.write("  - Identified key factors for high spending\n")
             f.write("  - Analyzed offer response predictors\n")
+        
+        # Question 1 Specific Analysis Summary
+        if q1_results:
+            f.write("• Question 1 (Amex Portal Analysis): Completed\n")
+            f.write(f"  - Statement 1 (Airline Offers): {q1_results['statement1']}\n")
+            f.write(f"  - Statement 2 (Discount Savings): {q1_results['statement2']}\n")
+            f.write(f"  - Active Users with Airline Offers: {q1_results['population']}\n")
         
         f.write("\nRECOMMENDations\n")
         f.write("-" * 15 + "\n")

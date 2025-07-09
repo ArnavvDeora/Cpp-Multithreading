@@ -168,6 +168,22 @@ To adapt the scripts for your specific dataset:
 
 ## 📝 Example Workflow
 
+### Complete Analysis Pipeline
+```bash
+# 1. Run complete preprocessing and analysis
+python run_complete_analysis.py
+```
+
+### Individual Question Analysis
+```bash
+# 1. First, run preprocessing if not done already
+python data_preprocessing.py
+
+# 2. Run specific question analysis
+python run_question1.py  # For Question 1 about Amex Portal users
+```
+
+### Programmatic Usage
 ```python
 # 1. Load and clean data
 from data_preprocessing import clean_dataset
@@ -178,9 +194,37 @@ from analysis_questions import DatasetAnalyzer
 analyzer = DatasetAnalyzer('cleaned_dataset.parquet')
 results = analyzer.generate_comprehensive_report()
 
-# 3. Create visualizations
+# 3. Run specific question analysis
+from question1_amex_analysis import AmexPortalAnalyzer
+q1_analyzer = AmexPortalAnalyzer('cleaned_dataset.parquet')
+q1_results = q1_analyzer.solve_question_1()
+
+# 4. Create visualizations
 analyzer.create_visualizations()
 ```
+
+## 🎯 Question 1 Analysis
+
+The project includes a dedicated analysis for **Question 1** about Amex Portal active users:
+
+### Question 1 Requirements:
+1. **Statement 1**: Active Users of the Amex Portal are more likely to choose Airline Offers than other offer categories
+2. **Statement 2**: Active Users of the Amex Portal are generally able to save more money from Discounts than other users  
+3. **Population Count**: Total unique customer IDs who actively use the Amex Portal and have clicked on an Airline Offer
+
+### Running Question 1:
+```bash
+python run_question1.py
+```
+
+### Expected Outputs:
+- `question1_results.txt` - Summary of TRUE/FALSE answers and population count
+- Detailed console analysis showing methodology and calculations
+- Automatic detection of relevant columns in your dataset
+
+### Active User Definition:
+- Users who visited the Amex Portal at least once in the past 30 days from any given date
+- The script automatically identifies active users using available data columns
 
 ## 🤝 Support
 
